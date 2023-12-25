@@ -4,6 +4,7 @@ SNOWFLAKE_CHAR="❄"
 MAX_SNOWFLAKE_PER_LINE=6
 SNOWFLAKES_OFFSETS=2
 SLEEPING_TIME=0.3
+OWNER="ZappaBoy"
 
 # trap ctrl-c and call ctrl_c()
 trap ctrl_c INT
@@ -34,7 +35,6 @@ snowflakes_y=()
 
 loop() {
     random_snowflake_number=$(get_random 0 $MAX_SNOWFLAKE_PER_LINE)
-    #echo $random_snowflake_number
 
     # Move the snowflakes to right or left
     updated_x_positions=()
@@ -73,10 +73,15 @@ loop() {
         snowflakes_y=("0" "${snowflakes_y[@]}")
     done
 
+    clear
+
+    tput cup $((lines / 5)) 0
+    figlet -c -k -w "$columns" "Merry Christmas by $OWNER"
+
     # Print all snowflakes
     # Snowflakes positions arrays has the same length
     length=${#snowflakes_x[@]}
-    clear
+    tput cup 0 0
 
     for ((i = 0; i < length; i++)); do
         x_position=${snowflakes_x[$i]}
@@ -85,7 +90,6 @@ loop() {
         if [ "$x_position" -gt 0 ]; then
             # Set cursor position
             tput cup "${y_position}" "${x_position}"
-            #echo -n $SNOWFLAKE_CHAR
             printf %s $SNOWFLAKE_CHAR
         fi
     done
