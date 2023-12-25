@@ -1,9 +1,9 @@
 #!/usr/bin/env sh
 
 SNOWFLAKE_CHAR="❄"
-MAX_SNOWFLAKE_PER_LINE=7
+MAX_SNOWFLAKE_PER_LINE=6
 SNOWFLAKES_OFFSETS=2
-SLEEPING_TIME=0.2
+SLEEPING_TIME=0.3
 
 # trap ctrl-c and call ctrl_c()
 trap ctrl_c INT
@@ -55,13 +55,13 @@ loop() {
     for y in "${snowflakes_y[@]}"; do
         new_y_position=$((y + 1))
         # Remove y greater than lines number
-        if [ "$new_y_position" -gt "$lines" ]; then
+        if [ "$new_y_position" -gt "$((lines))" ]; then
             # Simply remove x position
             snowflakes_x=("${snowflakes_x[@]:0:$((i-1))}" "${snowflakes_x[@]:$((i))}")
         else
             updated_y_positions+=("$new_y_position")
+            i=$((i + 1))
         fi
-        i=$((i + 1))
     done
 
     snowflakes_y=("${updated_y_positions[@]}")
@@ -85,7 +85,8 @@ loop() {
         if [ "$x_position" -gt 0 ]; then
             # Set cursor position
             tput cup "${y_position}" "${x_position}"
-            echo -n $SNOWFLAKE_CHAR
+            #echo -n $SNOWFLAKE_CHAR
+            printf %s $SNOWFLAKE_CHAR
         fi
     done
 
