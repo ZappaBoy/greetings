@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 
 SNOWFLAKE_CHAR="❄"
 MAX_SNOWFLAKE_PER_LINE=6
@@ -73,7 +73,7 @@ loop() {
         # Print snowflake only if x (column value) is positive
         if [ "$x_position" -gt 0 ]; then
             # Set cursor position
-            tput cup "${y_position}" "${x_position}"
+            tput cup "$y_position" "$x_position"
             printf %s $SNOWFLAKE_CHAR
         fi
     done
