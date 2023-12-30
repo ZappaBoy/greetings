@@ -2,11 +2,11 @@
 
 FIREWORK_CHAR="|"
 FIREWORK_EXPLODE_CHAR="✨"
-MAX_FIREWORKS_TO_DISPLAY=3
+MAX_FIREWORKS_TO_DISPLAY=8
 MAX_FIREWORKS_RADIUS=5
 FIREWORKS_SIZE=(15 20 25)
 SPAWN_FIREWORK_PROBABILITY=10
-FIREWORK_EXPLODE_PROBABILITY=30
+FIREWORK_EXPLODE_PROBABILITY=40
 SLEEPING_TIME=0.3
 OWNER="ZappaBoy"
 
@@ -44,13 +44,19 @@ loop() {
         y_coordinate="${coordinates[1]}"
         explode_radius="${coordinates[2]}"
 
-        if [[ $status != "$EXPLODE" && -n $y_coordinate && "${FIREWORKS_SIZE[*]}" =~ "$y_coordinate" ]]; then
-            random_probability=0
-            if [[ $y_coordinate -lt "${FIREWORKS_SIZE[-1]}" ]]; then
+        firework_size=$((lines - y_coordinate))
+        if [[ $status != "$EXPLODE" && -n $y_coordinate && "${FIREWORKS_SIZE[*]}" =~ "$firework_size" ]]; then
+
+            if [[ $firework_size -lt "${FIREWORKS_SIZE[0]}" ]]; then
+                random_probability=0
+            elif [[ $firework_size -ge "${FIREWORKS_SIZE[-1]}" ]]; then
+                random_probability=100
+            else
                 random_probability=$(get_random 0 100)
+                random_probability=$((100-random_probability))
             fi
 
-            if [ "$random_probability" -le $FIREWORK_EXPLODE_PROBABILITY ]; then
+            if [ "$random_probability" -gt "$FIREWORK_EXPLODE_PROBABILITY" ]; then
                 status=$EXPLODE
                 fireworks_status[i]="$status"
                 explode_radius=0
@@ -69,9 +75,11 @@ loop() {
                 ;;
             "$EXPLODE")
                 if [ "$explode_radius" -ge $MAX_FIREWORKS_RADIUS ]; then
+                    # This may seem weird but it is required to achive an iterable array data structure in bash
                     unset "fireworks_status[$i]"
                     unset "fireworks_paths[$i]"
-                    fireworks_on_display=$((fireworks_on_display - 1))
+                    fireworks_status=( "${fireworks_status[@]}" )
+                    fireworks_paths=( "${fireworks_paths[@]}" )
                 else
                     new_coordinates="$x_coordinate:$y_coordinate:$((explode_radius + 1))"
                     fireworks_paths[i]="$new_coordinates"
