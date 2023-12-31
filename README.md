@@ -8,7 +8,7 @@ If the dependencies are not installed an error will appear when you run the scri
 
 ## Examples
 ### Merry Christmas
-![Merry Christmas example Gif](https://github.com/ZappaBoy/merry-christmas/blob/main/examples/merry-christmas-example.gif)
+![Merry Christmas example Gif](https://github.com/ZappaBoy/greetings/blob/main/examples/merry-christmas-example.gif)
 
 ### And a happy new year
-![And a happy new year example Gif](https://github.com/ZappaBoy/merry-christmas/blob/main/examples/and-a-happy-new-year-example.gif)
+![And a happy new year example Gif](https://github.com/ZappaBoy/greetings/blob/main/examples/and-a-happy-new-year-example.gif)
