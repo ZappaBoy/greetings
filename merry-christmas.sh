@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 
 SNOWFLAKE_CHAR="❄"
 MAX_SNOWFLAKE_PER_LINE=6
@@ -6,34 +6,19 @@ SNOWFLAKES_OFFSETS=2
 SLEEPING_TIME=0.3
 OWNER="ZappaBoy"
 
-# trap ctrl-c and call ctrl_c()
-trap ctrl_c INT
-ctrl_c() {
-    clear
-    exit
-}
 
-get_columns() {
-    echo $(tput cols)
-}
+script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd -P)
+. "$script_dir/utils.sh"
 
-get_lines() {
-    echo $(tput lines)
-}
-
-get_random(){
-    min_value=${1:-0}
-    max_value=${2:-100}
-    echo $(( ( RANDOM % max_value ) + min_value ))
-}
-
-columns=$(get_columns)
-lines=$(get_lines)
+check_dependencies
 
 snowflakes_x=()
 snowflakes_y=()
 
 loop() {
+    # Checking columns and lines inside the loop allow the "resizable" behavior
+    columns=$(get_columns)
+    lines=$(get_lines)
     random_snowflake_number=$(get_random 0 $MAX_SNOWFLAKE_PER_LINE)
 
     # Move the snowflakes to right or left
@@ -74,14 +59,13 @@ loop() {
     done
 
     clear
-
     tput cup $((lines / 5)) 0
     figlet -c -k -w "$columns" "Merry Christmas by $OWNER"
+    tput cup 0 0
 
     # Print all snowflakes
     # Snowflakes positions arrays has the same length
     length=${#snowflakes_x[@]}
-    tput cup 0 0
 
     for ((i = 0; i < length; i++)); do
         x_position=${snowflakes_x[$i]}
@@ -89,7 +73,7 @@ loop() {
         # Print snowflake only if x (column value) is positive
         if [ "$x_position" -gt 0 ]; then
             # Set cursor position
-            tput cup "${y_position}" "${x_position}"
+            tput cup "$y_position" "$x_position"
             printf %s $SNOWFLAKE_CHAR
         fi
     done
