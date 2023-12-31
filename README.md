@@ -2,8 +2,9 @@
 These are scripts created just for fun to wish happy holidays in an original (CLI) way. 
 
 ## Dependencies
-Be sure you have installed the following dependencies before run the scripts: `figlet`.
-You should be able to install these dependencies using your disto package manager like `apt`, `pacman`, `dnf`, `emerge` etc.
+Be sure you have installed the following dependencies before running the scripts: `figlet`.
+You should be able to install these dependencies using your distro package manager like `apt`, `pacman`, `dnf`, `emerge` etc.
+If the dependencies are not installed an error will appear when you run the scripts.
 
 ## Examples
 ### Merry Christmas
