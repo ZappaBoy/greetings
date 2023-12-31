@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 
-FIREWORK_CHAR="|"
+NO_COLOR='\033[0m'
+YELLOW='\033[1;33m'
+FIREWORK_CHAR="¡"
 FIREWORK_EXPLODE_CHAR="✨"
-MAX_FIREWORKS_TO_DISPLAY=8
-MAX_FIREWORKS_RADIUS=5
-FIREWORKS_SIZE=(15 20 25)
-SPAWN_FIREWORK_PROBABILITY=10
-FIREWORK_EXPLODE_PROBABILITY=40
-SLEEPING_TIME=0.3
+MAX_FIREWORKS_RADIUS=3
+SPAWN_FIREWORK_PROBABILITY=30
+FIREWORK_EXPLODE_PROBABILITY=7
+SLEEPING_TIME=0.1
 OWNER="ZappaBoy"
 
 SPAWN="SPAWN"
@@ -19,16 +19,28 @@ script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd -P)
 
 check_dependencies
 
+print_char(){
+    printf "${YELLOW}${1}${NO_COLOR}"
+}
+
 fireworks_status=("$SPAWN" "$SPAWN" "$SPAWN")
-# Fireworks path are structured as "x_coordinate:y_coordinate"
+# Fireworks path are structured as "x_coordinate:y_coordinate:explosion_radius"
+# "explosion_radius" is available only when the firework is in "EXPLODE" state
+
+min_firework_size=$((MAX_FIREWORKS_RADIUS * 3))
+
 fireworks_paths=()
 loop() {
     # Checking columns and lines inside the loop allow the "resizable" behavior
     columns=$(get_columns)
     lines=$(get_lines)
+
+    max_fireworks_to_display=$((lines / 5))
+    max_firework_size=$((lines - MAX_FIREWORKS_RADIUS - 2))
+
     fireworks_on_display="${#fireworks_status[@]}"
 
-    if [[ "$fireworks_on_display" -eq 0 || "$fireworks_on_display" -lt $MAX_FIREWORKS_TO_DISPLAY ]]; then
+    if [[ "$fireworks_on_display" -eq 0 || "$fireworks_on_display" -lt $max_fireworks_to_display ]]; then
         random_probability=$(get_random 0 100)
         if [ "$random_probability" -le $SPAWN_FIREWORK_PROBABILITY ]; then
             fireworks_on_display=$((fireworks_on_display + 1))
@@ -45,18 +57,15 @@ loop() {
         explode_radius="${coordinates[2]}"
 
         firework_size=$((lines - y_coordinate))
-        if [[ $status != "$EXPLODE" && -n $y_coordinate && "${FIREWORKS_SIZE[*]}" =~ "$firework_size" ]]; then
+        if [[ $status != "$EXPLODE" && -n $y_coordinate && "$firework_size" -gt "$min_firework_size" ]]; then
 
-            if [[ $firework_size -lt "${FIREWORKS_SIZE[0]}" ]]; then
+            if [ $firework_size -gt $max_firework_size ]; then
                 random_probability=0
-            elif [[ $firework_size -ge "${FIREWORKS_SIZE[-1]}" ]]; then
-                random_probability=100
             else
                 random_probability=$(get_random 0 100)
-                random_probability=$((100-random_probability))
             fi
 
-            if [ "$random_probability" -gt "$FIREWORK_EXPLODE_PROBABILITY" ]; then
+            if [ "$random_probability" -lt $FIREWORK_EXPLODE_PROBABILITY ]; then
                 status=$EXPLODE
                 fireworks_status[i]="$status"
                 explode_radius=0
@@ -114,21 +123,21 @@ loop() {
 
             for radius in $( seq 0 "$explode_radius") ; do
                 tput cup "$((y_position + radius))" "$((x_position))"
-                printf %s "$char"
+                print_char "$char"
                 tput cup "$((y_position + radius))" "$((x_position + radius))"
-                printf %s "$char"
+                print_char "$char"
                 tput cup "$((y_position))" "$((x_position + radius))"
-                printf %s "$char"
+                print_char "$char"
                 tput cup "$((y_position - radius))" "$((x_position + radius))"
-                printf %s "$char"
+                print_char "$char"
                 tput cup "$((y_position - radius))" "$((x_position))"
-                printf %s "$char"
+                print_char "$char"
                 tput cup "$((y_position - radius))" "$((x_position - radius))"
-                printf %s "$char"
+                print_char "$char"
                 tput cup "$((y_position))" "$((x_position - radius))"
-                printf %s "$char"
+                print_char "$char"
                 tput cup "$((y_position + radius))" "$((x_position - radius))"
-                printf %s "$char"
+                print_char "$char"
             done
         fi
 
@@ -136,7 +145,7 @@ loop() {
         if [[ -n "$x_position" && "$x_position" -gt 0 ]]; then
             # Set cursor position
             tput cup "$y_position" "$x_position"
-            printf %s "$char"
+            print_char "$char"
         fi
     done
 
